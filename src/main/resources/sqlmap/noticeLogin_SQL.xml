@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.ddit.mapper.LoginMapper">
+
+	<select id="idCheck" parameterType="string"
+		resultType="dditmemberVO">
+		select
+		mem_no, mem_id, mem_name, mem_gender
+		from dditmember
+		where mem_id = #{memId}
+	</select>
+
+	<select id="loginCheck" parameterType="dditmemberVO"
+		resultType="dditmemberVO">
+		select
+		mem_no, mem_id, mem_pw, mem_name, mem_gender, mem_email, mem_phone,
+		mem_postcode, mem_address1, mem_address2, mem_agree, mem_profileimg, mem_regdate
+		from dditmember
+		where mem_id = #{memId}
+		and mem_pw = #{memPw}
+	</select>
+
+
+	<insert id="signup" parameterType="dditmemberVO">
+		insert into dditmember(
+		mem_no, mem_id, mem_pw, mem_name, mem_gender, mem_email, mem_phone,
+		mem_postcode, mem_address1, mem_address2, mem_agree, mem_profileimg, mem_regdate
+		) values (
+		seq_dditmember.nextval, #{memId}, #{memPw}, #{memName}, #{memGender},
+		#{memEmail},
+		#{memPhone}, #{memPostCode}, #{memAddress1}, #{memAddress2}, #{memAgree}, #{memProfileImg}, sysdate
+
+		)
+	</insert>
+
+
+
+	<select id="findId" parameterType="dditmemberVO"
+		resultType="String">
+		select mem_id from dditmember where mem_email = #{memEmail} and mem_name =
+		#{memName}
+	</select>
+
+	<select id="findPw" parameterType="dditmemberVO"
+		resultType="String">
+		select mem_pw from dditmember where mem_email = #{memEmail} and mem_name =
+		#{memName} and mem_id = #{memId}
+	</select>
+
+</mapper>

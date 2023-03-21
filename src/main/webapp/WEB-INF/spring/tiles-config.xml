@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles COnfiguration 3.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+	<definition name = "mainTemplate" template="/WEB-INF/views/mainTemplate.jsp">
+		<put-attribute name="header" value = "/WEB-INF/views/tiles/header.jsp"/>
+		<put-attribute name="footer" value = "/WEB-INF/views/tiles/footer.jsp"/>
+	</definition>
+	
+	<definition name = "loginTemplate" template="/WEB-INF/views/loginTemplate.jsp">
+	</definition>
+	
+	
+	<!-- 결과로 리턴되는 페이지 -->
+	<definition name = "notice/*" extends="mainTemplate">
+		<put-attribute name="content" value = "/WEB-INF/views/noticeboard/{1}.jsp"/>
+	</definition>
+	
+	<!-- 결과로 리턴되는 페이지 -->
+	<definition name = "conn/*" extends="loginTemplate">
+		<put-attribute name="content" value = "/WEB-INF/views/noticeboard/{1}.jsp"/>
+	</definition>
+	
+	
+	<!-- adminlte3 시작 -->
+	
+	
+	<definition name = "tiles-layout" template="/WEB-INF/views/tiles/index.jsp">
+		<put-attribute name="header" value = "/WEB-INF/views/tiles/lteHeader.jsp"/>
+		<put-attribute name="aside" value = "/WEB-INF/views/tiles/lteAside.jsp"/>
+		<put-attribute name="body" value = ""/>
+		<put-attribute name="footer" value = "/WEB-INF/views/tiles/lteFooter.jsp"/>
+	</definition>
+	
+	<!-- 
+		// forwarding
+		// views > springNotice폴더 > register.jsp
+		// return "springNotice/register";
+	 -->
+	
+	<definition name = "*/*" extends="tiles-layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp"></put-attribute>
+		
+	</definition>
+	
+	<!-- adminlte3 끝 -->
+</tiles-definitions>

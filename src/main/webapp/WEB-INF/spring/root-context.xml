@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+   
+   <!-- Root Context: defines shared resources visible to all other web components -->
+      <!-- 
+         root-context.xml: 스프링 설정을 위한 파일
+         
+         스프링 설정이란?
+            -view와 관련되지 않은 객체를 정의
+            -service(비즈니스 기능_), dao(repository: 저장소) , DB등 비즈니스 로직과 관련된 설정
+            -BasicDataSource data Source = new BasicDataSource();
+             dataSource.setDriverClassName() = "oracle.jdbc.driver.OracleDriver";
+         
+       -->
+       
+       <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+          <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+          <property name="url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
+          <property name="username" value="spring"/>
+          <property name="password" value="java"/>
+       </bean>
+       
+       <!-- 
+          데이터베이스와 연결을 맺고 끊어질 떄 까지의 라이프 사이클을 관리해주는 SqlSession 객체를 생성
+          1)dataSource
+          2)Mapper.xml의 위치 지정
+             -src/main/resources/
+          
+        -->
+        <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+           <property name="dataSource" ref="dataSource"/>
+           <property name="mapperLocations" value="classpath:/sqlmap/**/*_SQL.xml"/>
+           <property name="configLocation" value="/WEB-INF/mybatisAlias/mybatisAlias.xml"/>
+        </bean>
+      <!-- 
+            데이터베이스에 개별적으로 쿼리를 실행시키는 객체
+            이 객체를 통해서 query를 실행한다.   
+       -->
+
+        <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+            <constructor-arg name="sqlSessionFactory" index="0" ref="sqlSessionFactory"/>
+         </bean>
+         
+         
+         <!-- Mapper를 사용하겠다는 bean -->
+        <bean class = "org.mybatis.spring.mapper.MapperScannerConfigurer">
+        	<property name="basePackage" value = "kr.or.ddit.mapper"></property>
+        </bean>
+        
+<!--        
+         CommonsMultipartResolver start 
+ 		<bean id = "multipartResolver" class = "org.springframework.web.multipart.commons.CommonsMultipartResolver">
+			<property name="maxUploadSize" value="10485760"/>
+			<property name="defaultEncoding" value="UTF-8"/>
+		</bean>
+         CommonsMultipartResolver end 
+-->
+        <!-- file upload start -->
+		<bean id = "uploadPath" class = "java.lang.String">
+			<constructor-arg value ="D:\A_TeachingMaterial\08_Framework\02.SPRING2\workspace-spring2\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\DevProject\resources\upload"/>
+		</bean>
+
+		<!-- 스프링 AOP 활성화 -->
+		<aop:aspectj-autoproxy/>
+		<context:component-scan base-package="kr.or.ddit.aop"/>		
+		<context:component-scan base-package="kr.or.ddit.service"/>		
+		
+		<!-- 트랜잭션 설정 -->
+		<bean id = "transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+			<property name="dataSource" ref ="dataSource"></property>
+		</bean>
+		<!-- 어노테이션 기반의 트랜잭션 제어를 활성화 -->
+		<tx:annotation-driven/>
+</beans>
