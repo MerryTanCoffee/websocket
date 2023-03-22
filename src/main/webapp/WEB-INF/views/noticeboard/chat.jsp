@@ -7,16 +7,89 @@
 
 	<input type="text" name="memId" name = "memId" id = "memId" value ="${sessionScope.SessionInfo.memName }" readonly/>
 	<input type="text" id="msg" />
-	<input type="button" id="sendBtn" value="전송"/>
+	<input type="file" id="inputFile"/>
+	<input type="button" id="sendBtn" value="전송"/><br/>
 	<div id="messageArea"></div>
+
 </body>	
 <script type="text/javascript">
 $(function(){
 var memId = $("#memId");
 var sendBtn = $("#sendBtn");
 var msg = $("#msg");
-var messageArea = $("#messageArea");
+var inputFile = $("#inputFile");	
+
+inputFile.on("change", function(event){
+	console.log("change event,,");
 	
+	var files = event.target.files;
+	var file = files[0];
+	
+	console.log(file);
+	
+		
+		// ajax로 파일을 컨트롤 시 formData를 이용한다.
+		// append() 이용
+		var formData = new FormData();
+		// key : value 형태로 값이 추가된다.
+		formData.append("file", file);
+		
+		// formData는 key/value 형식으로 데이터가 저장된다.
+		// dataType : 응답(response) 데이터를 내보낼 때 보내줄 데이터 타입이다.
+		// processData : 데이터 파라미터를 data라는 속성으로 넣는데 제이쿼리 내부적으로 쿼리스트링을 구성한다.
+		// 				파일 전송의 경우 쿼리 스트링을 사용하지 않으므로 해당 설정을 false한다.
+		// contentType : content-Type 설정 시 사용하는데 해당 설정의 기본값은 "application/x-www-form-urlencoded; charset=utf-8"이다
+		// request 요청에서 content-Type을 확인해보면 "multipart/form-data; boundary=---WebkitFormBoundary7Taxt434B
+		// 과 같은 값을 전송되는 걸 확인할 수 있다.
+		
+		$.ajax({
+			type : "post",
+			url : "/ajax/uploadAjax",
+			data : formData,
+			dataType : "text",
+			processData : false,
+			contentType : false,
+			success : function(data){
+				//alert(data);
+				var str = "";
+				if(checkImageType(data)) { // 이미지이면 이미지 태그를 이용한 출력형태
+					str += "<div>";
+					str += "	<a href = '/ajax/displayFile?fileName="+ data + "'>";
+					str += "	<img src = '/ajax/displayFile?fileName=" + getThumbnailName(data)+ "'/>";
+					str += "	</a>";
+					str += "</div>";
+				} else { // 파일이면 파일명에 대한 링크로만 출력
+					str += "<div>";
+					str += "	<a href ='/ajax/displayFile?fileName="+data+"'>" +getOriginalName(data) + "</a>";
+					str += "</div>";
+				}
+				$("#messageArea").prepend(str);
+			}
+		});
+});
+
+function getOriginalName(fileName){
+	if(checkImageType(fileName)){
+		return;
+	}		
+	var idx = fileName.indexOf("_") + 1;
+	return fileName.substr(idx);
+}
+function getThumbnailName(fileName){
+	var front = fileName.substr(0,12);
+	var end = fileName.substr(12);
+	
+	console.log("front : " + front);
+	console.log("end : " + end);
+	
+	return front + "s_" + end;
+}
+
+function checkImageType(fileName){
+	var pattern = /jpg|gif|png|jpeg/i;
+	return fileName.match(pattern); // 패턴과 일치하면 true (너 이미지 맞구나?)
+}
+
 
 	// websocket 생성
     const websocket = new WebSocket("ws://192.168.34.18/echo"); // IP or localhost넣기

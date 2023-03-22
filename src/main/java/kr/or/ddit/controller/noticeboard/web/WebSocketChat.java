@@ -46,7 +46,7 @@ public class WebSocketChat extends TextWebSocketHandler {
 		log.info(session.getId() + "로부터 메시지 수신: " + message.getPayload());
 		// 모든 유저에게 발송
 		
-		
+		String senderId = (String) session.getAttributes().get("sessionId");
 		for(WebSocketSession sess: sessionList) {
 			sess.sendMessage(new TextMessage(message.getPayload()));
 		}
